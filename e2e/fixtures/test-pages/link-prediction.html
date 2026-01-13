@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Link Prediction Test Page</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    a {
+      padding: 1rem;
+      background: #f0f0f0;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #333;
+    }
+    a:hover {
+      background: #e0e0e0;
+    }
+  </style>
+  <script>
+    // Configuration for link prediction testing
+    window.zephyrConfig = {
+      rules: [
+        { test: '.*\\/products\\/.*', method: 'GET', cache: 60 },
+        { test: '.*\\.(jpg|png|gif|webp)$', method: 'GET', cache: 60 },
+      ],
+      eagerCache: {
+        linkPrediction: {
+          enabled: true,
+          scope: 'rules-only',
+          delay: 150,
+          triggers: ['mouseenter', 'touchstart'],
+          maxConcurrent: 2,
+          respectDataSaver: true,
+          exclude: ['.*\\/logout', '.*\\/checkout'],
+        },
+      },
+    };
+  </script>
+  <script src="/lib/zephrInstall.js"></script>
+</head>
+<body>
+  <h1>Link Prediction Test Page</h1>
+  <p>Hover over the links below to trigger prefetch:</p>
+
+  <nav>
+    <!-- Links matching rules (should prefetch) -->
+    <a href="/products/123">Product 123 (matches rule)</a>
+    <a href="/products/456">Product 456 (matches rule)</a>
+    <a href="/products/789">Product 789 (matches rule)</a>
+    <a href="/products/test.jpg">Product Image (matches image rule)</a>
+
+    <!-- Links NOT matching rules (should NOT prefetch in rules-only scope) -->
+    <a href="/random/page">Random Page (no rule match)</a>
+    <a href="/about">About Page (no rule match)</a>
+
+    <!-- Cross-origin link (should NEVER prefetch) -->
+    <a href="https://external.com/page">External Link (cross-origin)</a>
+
+    <!-- Excluded links (should NOT prefetch) -->
+    <a href="/logout">Logout (excluded)</a>
+    <a href="/checkout">Checkout (excluded)</a>
+
+    <!-- Test links for specific scenarios -->
+    <a href="/quick-hover">Quick Hover Test</a>
+    <a href="/long-hover">Long Hover Test</a>
+    <a href="/cancel-test">Cancel Test</a>
+    <a href="/data-saver-test">Data Saver Test</a>
+    <a href="/slow-connection-test">Slow Connection Test</a>
+  </nav>
+
+  <div id="status"></div>
+
+  <script>
+    // Show status updates
+    const status = document.getElementById('status');
+
+    if (window.zephyr) {
+      window.zephyr.onPrecacheComplete?.((event) => {
+        status.innerHTML += `<p>Precache complete: ${event.succeeded}/${event.total}</p>`;
+      });
+    }
+  </script>
+</body>
+</html>

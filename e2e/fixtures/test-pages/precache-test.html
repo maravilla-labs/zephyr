@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Precache Test Page</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    #status {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+  </style>
+  <script>
+    // Configuration for precache testing
+    window.zephyrConfig = {
+      rules: [
+        { test: '.*\\.(css|js)$', method: 'GET', cache: 60 },
+        { test: '.*\\.(jpg|png|gif)$', method: 'GET', cache: 60 },
+        { test: '.*\\/api\\/.*', method: 'GET', cache: 30 },
+      ],
+      eagerCache: {
+        precache: {
+          urls: [
+            '/css/main.css',
+            '/js/app.js',
+            '/images/logo.png',
+            '/api/config',
+          ],
+          patterns: ['.*\\/products\\/.*'],
+          retries: 2,
+          failSilently: true,
+        },
+      },
+    };
+  </script>
+  <script src="/lib/zephrInstall.js"></script>
+</head>
+<body>
+  <h1>Precache Test Page</h1>
+  <p>This page tests precaching of URLs during service worker installation.</p>
+
+  <h2>Expected Precached URLs:</h2>
+  <ul>
+    <li>/css/main.css</li>
+    <li>/js/app.js</li>
+    <li>/images/logo.png</li>
+    <li>/api/config</li>
+  </ul>
+
+  <div id="status">
+    <h3>Status:</h3>
+    <p id="precache-status">Waiting for precache...</p>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById('precache-status');
+
+    // Listen for precache completion
+    if (window.zephyr?.onPrecacheComplete) {
+      window.zephyr.onPrecacheComplete((event) => {
+        statusEl.textContent = `Precache complete: ${event.succeeded} succeeded, ${event.failed} failed (${event.total} total)`;
+      });
+    }
+
+    // Also check stats after a delay
+    setTimeout(async () => {
+      if (window.zephyr?.stats) {
+        const stats = await window.zephyr.stats();
+        statusEl.textContent += ` | Entries: ${stats.entries}, Prefetches: ${stats.prefetches || 0}`;
+      }
+    }, 3000);
+  </script>
+</body>
+</html>
