@@ -1,0 +1,11 @@
+# VuePress
+docs/.vuepress/.cache/
+docs/.vuepress/.temp/
+docs/.vuepress/dist/
+
+# SveltePress (from previous attempt)
+.svelte-kit/
+.sveltepress/
+
+# Dependencies
+node_modules/

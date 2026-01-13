@@ -46,7 +46,10 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "lint": "eslint lib/",
-    "prepublishOnly": "npm run test:run"
+    "prepublishOnly": "npm run test:run",
+    "docs:dev": "cd docs && pnpm docs:dev",
+    "docs:build": "cd docs && pnpm docs:build",
+    "docs:preview": "cd docs && pnpm docs:preview"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
